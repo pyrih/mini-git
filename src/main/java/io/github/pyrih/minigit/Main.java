@@ -15,11 +15,29 @@ public class Main {
         Repository repository = new Repository();
         register(new InitCommand(repository));
 
-        Command command = COMMANDS.getOrDefault("init", new HelpCommand());
-        command.execute();
+        if (args.length < 1) {
+            System.out.println("No command provided. Bye!");
+            return;
+        }
+
+        String name = args[0].toLowerCase();
+        Command command = COMMANDS.getOrDefault(name, new HelpCommand());
+
+        if (args.length == 1) {
+            command.execute();
+        }
+
+        String[] parameters = new String[args.length - 1];
+        System.arraycopy(args, 1, parameters, 0, args.length - 1);
+
+        command.execute(parameters);
+
     }
 
     private static void register(Command command) {
-        COMMANDS.put(command.getName(), command);
+        COMMANDS.put(
+                command.getName().toLowerCase(),
+                command
+        );
     }
 }
