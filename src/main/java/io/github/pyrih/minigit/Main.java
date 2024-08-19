@@ -25,12 +25,12 @@ public class Main {
 
         if (args.length == 1) {
             command.execute();
+        } else {
+            String[] parameters = new String[args.length - 1];
+            System.arraycopy(args, 1, parameters, 0, args.length - 1);
+
+            command.execute(parameters);
         }
-
-        String[] parameters = new String[args.length - 1];
-        System.arraycopy(args, 1, parameters, 0, args.length - 1);
-
-        command.execute(parameters);
 
     }
 
