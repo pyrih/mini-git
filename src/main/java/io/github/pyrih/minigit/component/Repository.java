@@ -6,11 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Repository {
+
+    public static final String GIT_DIRECTORY = ".minigit";
+
     public void init() {
         System.out.println("Initialize a new repository...");
 
         try {
-            Path path = Path.of(".minigit");
+            Path path = Path.of(GIT_DIRECTORY);
             File dir = path.toFile();
 
             if (!dir.exists()) {
