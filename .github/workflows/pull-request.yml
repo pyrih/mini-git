@@ -1,0 +1,25 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '22'
+          distribution: 'adopt'
+          cache: maven
+
+      - name: Build and Test
+        run: |
+          mvn -B -U clean verify --file pom.xml
