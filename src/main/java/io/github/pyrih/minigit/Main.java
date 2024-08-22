@@ -1,6 +1,7 @@
 package io.github.pyrih.minigit;
 
 import io.github.pyrih.minigit.command.Command;
+import io.github.pyrih.minigit.command.HashObjectCommand;
 import io.github.pyrih.minigit.command.HelpCommand;
 import io.github.pyrih.minigit.command.InitCommand;
 import io.github.pyrih.minigit.component.Repository;
@@ -13,7 +14,9 @@ public class Main {
 
     public static void main(String[] args) {
         Repository repository = new Repository();
+
         register(new InitCommand(repository));
+        register(new HashObjectCommand(repository));
 
         if (args.length < 1) {
             System.out.println("No command provided. Bye!");

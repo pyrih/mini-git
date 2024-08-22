@@ -1,9 +1,12 @@
 package io.github.pyrih.minigit.component;
 
+import io.github.pyrih.minigit.Utils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class Repository {
 
@@ -39,4 +42,28 @@ public class Repository {
         }
     }
 
+    public void hashObject(String parameter) {
+        // 1. Get the path of the file to store
+        Path toStoreFilePath = Path.of(parameter);
+
+        // 2. Read the file
+        String content = Utils.readFileContent(toStoreFilePath);
+
+        // 3. Hash the content of the file using SHA-1
+        String oid = Utils.generateSHA1Hash(content);
+
+        // 4. Store the file under ".minigit/objects/{hash}"
+        Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
+        System.out.println(STR."A \{toStoreFilePath} will be stored under the following path: \{targetPath}");
+
+        if (targetPath.toFile().exists()) {
+            System.out.println(STR."An existing \{targetPath} file will be replaced...");
+        }
+
+        try {
+            Files.copy(toStoreFilePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while copying a file to an object database");
+        }
+    }
 }
