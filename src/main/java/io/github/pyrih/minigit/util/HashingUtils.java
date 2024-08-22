@@ -1,13 +1,13 @@
-package io.github.pyrih.minigit;
+package io.github.pyrih.minigit.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public class Utils {
+public class HashingUtils {
 
-    private Utils() {
+    private HashingUtils() {
     }
 
     public static String encryptToSHA1(String input) {

@@ -1,6 +1,6 @@
 package io.github.pyrih.minigit.component;
 
-import io.github.pyrih.minigit.Utils;
+import io.github.pyrih.minigit.util.HashingUtils;
 import io.github.pyrih.minigit.util.FileUtils;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class Repository {
         String content = FileUtils.readFileContent(toStoreFilePath);
 
         // 3. Hash the content of the file using SHA-1
-        String oid = Utils.generateSHA1Hash(content);
+        String oid = HashingUtils.generateSHA1Hash(content);
 
         // 4. Store the file under ".minigit/objects/{hash}"
         Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
