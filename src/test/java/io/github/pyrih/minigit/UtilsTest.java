@@ -24,4 +24,14 @@ class UtilsTest {
 
         Assertions.assertEquals("An input value cannot be null.", actual.getMessage());
     }
+
+    @Test
+    void shouldGenerateSHA1HashFromInputString() {
+        String input = "this is cool";
+        String expected = "60f51187e76a9de0ff3df31f051bde04da2da891";
+
+        String actual = Utils.generateSHA1Hash(input);
+
+        Assertions.assertEquals(expected, actual);
+    }
 }
