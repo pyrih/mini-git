@@ -1,17 +1,13 @@
-package io.github.pyrih.minigit;
+package io.github.pyrih.minigit.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public class Utils {
+public class HashingUtils {
 
-    private Utils() {
+    private HashingUtils() {
     }
 
     public static String encryptToSHA1(String input) {
@@ -50,21 +46,6 @@ public class Utils {
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-1 algorithm is not available.");
-        }
-    }
-
-    public static String readFileContent(Path path) {
-        File toStoreFile = path.toFile();
-
-        if (!toStoreFile.exists()) {
-            throw new IllegalArgumentException(STR."A file \{toStoreFile.getAbsolutePath()} doesn't exist.");
-        }
-
-        try {
-            return Files.readString(path);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Error occurred while reading a file content");
         }
     }
 }
