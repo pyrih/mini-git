@@ -18,9 +18,8 @@ public class FileUtils {
 
         try {
             return Files.readString(path);
-
         } catch (IOException e) {
-            throw new RuntimeException("Error occurred while reading a file content");
+            throw new RuntimeException("Error occurred while reading a file content.");
         }
     }
 }
