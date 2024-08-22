@@ -7,22 +7,32 @@ import java.nio.file.Path;
 
 public class Repository {
 
-    public static final String GIT_DIRECTORY = ".minigit";
+    private static final String GIT_DIRECTORY = ".minigit";
+    private static final String OBJECTS_DIRECTORY = "objects";
 
     public void init() {
         System.out.println("Initialize a new repository...");
 
         try {
-            Path path = Path.of(GIT_DIRECTORY);
-            File dir = path.toFile();
+            Path gitDirectoryPath = Path.of(GIT_DIRECTORY);
+            File gitDirectory = gitDirectoryPath.toFile();
 
-            if (!dir.exists()) {
-                Path directory = Files.createDirectory(path);
-                System.out.println("Initialized an empty repository in " + directory.getFileName().toString());
+            if (!gitDirectory.exists()) {
+                Path gitDirectoryPathCreated = Files.createDirectory(gitDirectoryPath);
+                System.out.println("Initialized an empty repository in " + gitDirectoryPathCreated.getFileName().toString());
             } else {
-                System.out.println("A repository directory has been created already.");
+                System.out.println("A repository directory has been already created.");
             }
 
+            Path objectsDirectoryPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY);
+            File objectsDirectory = objectsDirectoryPath.toFile();
+
+            if (!objectsDirectory.exists()) {
+                Path objectsDirectoryPathCreated = Files.createDirectory(objectsDirectoryPath);
+                System.out.println("An objects directory " + objectsDirectoryPathCreated.getFileName().toString() + " has been created in repository directory.");
+            } else {
+                System.out.println("An objects directory has been already created.");
+            }
 
         } catch (IOException e) {
             throw new RuntimeException("Error while creating of a directory", e);
