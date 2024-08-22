@@ -19,7 +19,7 @@ public class Utils {
             throw new IllegalArgumentException("An input value cannot be null.");
         }
 
-        MessageDigest digest = null;
+        MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
@@ -61,8 +61,7 @@ public class Utils {
         }
 
         try {
-            String content = Files.readString(path);
-            return content;
+            return Files.readString(path);
 
         } catch (IOException e) {
             throw new RuntimeException("Error occurred while reading a file content");
