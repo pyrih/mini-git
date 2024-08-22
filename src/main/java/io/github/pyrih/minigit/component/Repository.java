@@ -66,4 +66,15 @@ public class Repository {
             throw new RuntimeException("An error occurred while copying a file to an object database");
         }
     }
+
+    public void catFile(String parameter) {
+        Path path = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, parameter);
+
+        if (!path.toFile().exists()) {
+            throw new IllegalArgumentException(STR."A file under the \{path} path doesn't exist");
+        }
+
+        String content = Utils.readFileContent(path);
+        System.out.println(content);
+    }
 }

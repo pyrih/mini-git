@@ -1,6 +1,7 @@
 package io.github.pyrih.minigit;
 
 import io.github.pyrih.minigit.command.Command;
+import io.github.pyrih.minigit.command.CatFileCommand;
 import io.github.pyrih.minigit.command.HashObjectCommand;
 import io.github.pyrih.minigit.command.HelpCommand;
 import io.github.pyrih.minigit.command.InitCommand;
@@ -17,6 +18,7 @@ public class Main {
 
         register(new InitCommand(repository));
         register(new HashObjectCommand(repository));
+        register(new CatFileCommand(repository));
 
         if (args.length < 1) {
             System.out.println("No command provided. Bye!");
