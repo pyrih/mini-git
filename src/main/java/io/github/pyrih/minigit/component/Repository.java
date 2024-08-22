@@ -1,6 +1,7 @@
 package io.github.pyrih.minigit.component;
 
 import io.github.pyrih.minigit.Utils;
+import io.github.pyrih.minigit.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class Repository {
         Path toStoreFilePath = Path.of(parameter);
 
         // 2. Read the file
-        String content = Utils.readFileContent(toStoreFilePath);
+        String content = FileUtils.readFileContent(toStoreFilePath);
 
         // 3. Hash the content of the file using SHA-1
         String oid = Utils.generateSHA1Hash(content);
@@ -74,7 +75,7 @@ public class Repository {
             throw new IllegalArgumentException(STR."A file under the \{path} path doesn't exist");
         }
 
-        String content = Utils.readFileContent(path);
+        String content = FileUtils.readFileContent(path);
         System.out.println(content);
     }
 }
