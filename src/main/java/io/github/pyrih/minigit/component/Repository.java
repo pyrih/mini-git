@@ -19,9 +19,9 @@ public class Repository {
 
             if (!gitDirectory.exists()) {
                 Path gitDirectoryPathCreated = Files.createDirectory(gitDirectoryPath);
-                System.out.println("Initialized an empty repository in " + gitDirectoryPathCreated.getFileName().toString());
+                System.out.println(STR."Initialized an empty repository in \{gitDirectoryPathCreated.getFileName().toString()} directory");
             } else {
-                System.out.println("A repository directory has been already created.");
+                System.out.println(STR."A \{GIT_DIRECTORY} repository directory has been already created.");
             }
 
             Path objectsDirectoryPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY);
@@ -29,9 +29,9 @@ public class Repository {
 
             if (!objectsDirectory.exists()) {
                 Path objectsDirectoryPathCreated = Files.createDirectory(objectsDirectoryPath);
-                System.out.println("An objects directory " + objectsDirectoryPathCreated.getFileName().toString() + " has been created in repository directory.");
+                System.out.println(STR."An \{objectsDirectoryPathCreated.getFileName().toString()} directory has been created in \{GIT_DIRECTORY} repository directory.");
             } else {
-                System.out.println("An objects directory has been already created.");
+                System.out.println(STR."An \{OBJECTS_DIRECTORY} directory has been already created.");
             }
 
         } catch (IOException e) {
