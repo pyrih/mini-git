@@ -1,7 +1,10 @@
-package io.github.pyrih.minigit.command;
+package io.github.pyrih.minigit.dispatcher.command.impl;
 
 import io.github.pyrih.minigit.component.Repository;
+import io.github.pyrih.minigit.dispatcher.command.Command;
+import io.github.pyrih.minigit.dispatcher.command.annotation.CommandDefinition;
 
+@CommandDefinition(name = "hash-object")
 public class HashObjectCommand implements Command {
     private final Repository repository;
 
@@ -18,10 +21,5 @@ public class HashObjectCommand implements Command {
         String parameter = parameters[0];
 
         this.repository.hashObject(parameter);
-    }
-
-    @Override
-    public String getName() {
-        return "hash-object";
     }
 }
