@@ -1,7 +1,10 @@
-package io.github.pyrih.minigit.command;
+package io.github.pyrih.minigit.dispatcher.command.impl;
 
 import io.github.pyrih.minigit.component.Repository;
+import io.github.pyrih.minigit.dispatcher.command.Command;
+import io.github.pyrih.minigit.dispatcher.command.annotation.CommandDefinition;
 
+@CommandDefinition(name = "cat-file")
 public class CatFileCommand implements Command {
     private final Repository repository;
 
@@ -18,10 +21,5 @@ public class CatFileCommand implements Command {
         String parameter = parameters[0];
 
         this.repository.catFile(parameter);
-    }
-
-    @Override
-    public String getName() {
-        return "cat-file";
     }
 }

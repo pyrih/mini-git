@@ -1,48 +1,23 @@
 package io.github.pyrih.minigit;
 
-import io.github.pyrih.minigit.command.Command;
-import io.github.pyrih.minigit.command.CatFileCommand;
-import io.github.pyrih.minigit.command.HashObjectCommand;
-import io.github.pyrih.minigit.command.HelpCommand;
-import io.github.pyrih.minigit.command.InitCommand;
 import io.github.pyrih.minigit.component.Repository;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.github.pyrih.minigit.dispatcher.CommandDispatcher;
+import io.github.pyrih.minigit.util.ArgumentUtils;
 
 public class Main {
-    private static final Map<String, Command> COMMANDS = new HashMap<>();
-
     public static void main(String[] args) {
+        ArgumentUtils.validateArguments(args);
+
         Repository repository = new Repository();
+        CommandDispatcher dispatcher = new CommandDispatcher(repository);
 
-        register(new InitCommand(repository));
-        register(new HashObjectCommand(repository));
-        register(new CatFileCommand(repository));
-
-        if (args.length < 1) {
-            System.out.println("No command provided. Bye!");
-            return;
-        }
-
-        String name = args[0].toLowerCase();
-        Command command = COMMANDS.getOrDefault(name, new HelpCommand());
+        String commandDefinition = args[0].toLowerCase();
 
         if (args.length == 1) {
-            command.execute();
+            dispatcher.dispatch(commandDefinition);
         } else {
-            String[] parameters = new String[args.length - 1];
-            System.arraycopy(args, 1, parameters, 0, args.length - 1);
-
-            command.execute(parameters);
+            String[] arguments = ArgumentUtils.extractRemainingArguments(args);
+            dispatcher.dispatch(commandDefinition, arguments);
         }
-
-    }
-
-    private static void register(Command command) {
-        COMMANDS.put(
-                command.getName().toLowerCase(),
-                command
-        );
     }
 }
