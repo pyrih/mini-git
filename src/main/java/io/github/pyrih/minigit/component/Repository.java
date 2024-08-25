@@ -1,7 +1,7 @@
 package io.github.pyrih.minigit.component;
 
-import io.github.pyrih.minigit.util.HashingUtils;
 import io.github.pyrih.minigit.util.FileUtils;
+import io.github.pyrih.minigit.util.HashingUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +23,9 @@ public class Repository {
 
             if (!gitDirectory.exists()) {
                 Path gitDirectoryPathCreated = Files.createDirectory(gitDirectoryPath);
-                System.out.println(STR."Initialized an empty repository in \{gitDirectoryPathCreated.getFileName().toString()} directory");
+                System.out.println("Initialized an empty repository in " + gitDirectoryPathCreated.getFileName().toString() + " directory");
             } else {
-                System.out.println(STR."A \{GIT_DIRECTORY} repository directory has been already created.");
+                System.out.println("A " + GIT_DIRECTORY + " repository directory has been already created.");
             }
 
             Path objectsDirectoryPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY);
@@ -33,9 +33,9 @@ public class Repository {
 
             if (!objectsDirectory.exists()) {
                 Path objectsDirectoryPathCreated = Files.createDirectory(objectsDirectoryPath);
-                System.out.println(STR."An \{objectsDirectoryPathCreated.getFileName().toString()} directory has been created in \{GIT_DIRECTORY} repository directory.");
+                System.out.println("An " + objectsDirectoryPathCreated.getFileName().toString() + " directory has been created in " + GIT_DIRECTORY + " repository directory.");
             } else {
-                System.out.println(STR."An \{OBJECTS_DIRECTORY} directory has been already created.");
+                System.out.println("An " + OBJECTS_DIRECTORY + " directory has been already created.");
             }
 
         } catch (IOException e) {
@@ -55,10 +55,10 @@ public class Repository {
 
         // 4. Store the file under ".minigit/objects/{hash}"
         Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
-        System.out.println(STR."A \{toStoreFilePath} will be stored under the following path: \{targetPath}");
+        System.out.println("A " + toStoreFilePath + " will be stored under the following path: " + targetPath);
 
         if (targetPath.toFile().exists()) {
-            System.out.println(STR."An existing \{targetPath} file will be replaced...");
+            System.out.println("An existing " + targetPath + " file will be replaced...");
         }
 
         try {
@@ -72,7 +72,7 @@ public class Repository {
         Path path = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, parameter);
 
         if (!path.toFile().exists()) {
-            throw new IllegalArgumentException(STR."A file under the \{path} path doesn't exist");
+            throw new IllegalArgumentException("A file under the " + path + " path doesn't exist");
         }
 
         String content = FileUtils.readFileContent(path);

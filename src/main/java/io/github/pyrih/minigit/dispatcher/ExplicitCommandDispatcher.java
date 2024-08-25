@@ -28,7 +28,7 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
         if (command != null) {
             command.execute(arguments);
         } else {
-            throw new IllegalArgumentException(STR."Unkown command: \{commandDefinition}");
+            throw new IllegalArgumentException("Unknown command: " + commandDefinition);
         }
     }
 
@@ -42,7 +42,7 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
                 COMMANDS.put(definition.name(), command);
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException e) {
-                throw new RuntimeException(STR."Failed to register command: \{cls.getName()}", e);
+                throw new RuntimeException("Failed to register command: " + cls.getName(), e);
             }
         }
     }
