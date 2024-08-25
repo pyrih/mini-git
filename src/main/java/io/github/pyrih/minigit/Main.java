@@ -2,6 +2,7 @@ package io.github.pyrih.minigit;
 
 import io.github.pyrih.minigit.component.Repository;
 import io.github.pyrih.minigit.dispatcher.CommandDispatcher;
+import io.github.pyrih.minigit.dispatcher.ExplicitCommandDispatcher;
 import io.github.pyrih.minigit.util.ArgumentUtils;
 
 public class Main {
@@ -9,7 +10,7 @@ public class Main {
         ArgumentUtils.validateArguments(args);
 
         Repository repository = new Repository();
-        CommandDispatcher dispatcher = new CommandDispatcher(repository);
+        CommandDispatcher dispatcher = new ExplicitCommandDispatcher(repository);
 
         String commandDefinition = args[0].toLowerCase();
 
