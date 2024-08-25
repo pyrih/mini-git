@@ -13,7 +13,7 @@ public class FileUtils {
         File toStoreFile = path.toFile();
 
         if (!toStoreFile.exists()) {
-            throw new IllegalArgumentException(STR."A file \{toStoreFile.getAbsolutePath()} doesn't exist.");
+            throw new IllegalArgumentException("A file " + toStoreFile.getAbsolutePath() + " doesn't exist.");
         }
 
         try {

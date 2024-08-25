@@ -58,7 +58,7 @@ class FileUtilsTest {
 
         Assertions.assertTrue(
                 exception.getMessage().contains(
-                        STR."A file \{nonExistingFilePath.toFile().getAbsolutePath()} doesn't exist."
+                        "A file " + nonExistingFilePath.toFile().getAbsolutePath() + " doesn't exist."
                 )
         );
     }

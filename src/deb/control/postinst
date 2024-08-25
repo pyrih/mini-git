@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo '#!/bin/bash' > /usr/local/bin/minigit
+echo 'java -jar /usr/share/jdeb/lib/minigit.jar "$@"' >> /usr/local/bin/minigit
+
+chmod +x /usr/local/bin/minigit
