@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.pyrih</groupId>
-    <artifactId>mini-git</artifactId>
+    <artifactId>minigit</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>mini-git</name>
-    <description>A mini git application</description>
+    <name>minigit</name>
+    <description>A command-line mini Git client written in Java</description>
     <url>https://github.com/pyrih/mini-git</url>
 
     <properties>
