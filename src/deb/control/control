@@ -3,6 +3,6 @@ Version: [[version]]
 Section: utils
 Priority: optional
 Architecture: all
-Depends: default-jre | openjdk-21-jre-headless
+Depends: default-jre
 Maintainer: Andrii Pyrih <andrii.pyrih@gmail.com>
 Description: [[description]]
