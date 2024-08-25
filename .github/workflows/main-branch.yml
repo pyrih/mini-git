@@ -32,16 +32,19 @@ jobs:
         run: |
           mvn test
 
-      - name: Increment Version and Deploy/Publish to GitHub Packages Apache Maven
-        if: ${{ success() }} && ${{ github.ref == 'refs/heads/main' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Increment Version (for Snapshots)
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           NEW_VERSION=1.0.${{ github.run_number }}
           mvn versions:set -DnewVersion=1.0.$NEW_VERSION-SNAPSHOT
           mvn clean package
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git commit -am "Update version to 1.0.$NEW_VERSION-SNAPSHOT"
-          git push
-          mvn deploy
+          git commit -am "Update snapshot version to 1.0.$NEW_VERSION-SNAPSHOT"
+          git push 
+
+      - name: Deploy to GitHub Packages (Optional)
+        if: ${{ success() }} && ${{ github.ref == 'refs/heads/main' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn deploy
