@@ -5,7 +5,6 @@ import io.github.pyrih.minigit.dispatcher.command.Command;
 import io.github.pyrih.minigit.dispatcher.command.annotation.CommandDefinition;
 import io.github.pyrih.minigit.dispatcher.command.impl.*;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,32 +30,29 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
     }
 
     private void register(Class<? extends Command> cls, Repository repository) {
-        if (cls.isAnnotationPresent(CommandDefinition.class)) {
-            CommandDefinition definition = cls.getAnnotation(CommandDefinition.class);
-
-            try {
-                Constructor<? extends Command> constructor = cls.getConstructor(Repository.class);
-                Command command = constructor.newInstance(repository);
-                COMMANDS.put(definition.name(), command);
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                     IllegalAccessException e) {
-                throw new RuntimeException("Failed to register command: " + cls.getName(), e);
-            }
-        }
+        registerCommand(cls, repository);
     }
 
     private void register(Class<? extends Command> cls) {
-        if (cls.isAnnotationPresent(CommandDefinition.class)) {
-            CommandDefinition definition = cls.getAnnotation(CommandDefinition.class);
+        registerCommand(cls, null);
+    }
 
-            try {
-                Constructor<? extends Command> constructor = cls.getConstructor();
-                Command command = constructor.newInstance();
-                COMMANDS.put(definition.name(), command);
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                     IllegalAccessException e) {
-                throw new RuntimeException("Failed to register command: " + cls.getName(), e);
-            }
+    private void registerCommand(Class<? extends Command> cls, Repository repository) {
+        if (!cls.isAnnotationPresent(CommandDefinition.class)) {
+            return;
+        }
+
+        CommandDefinition definition = cls.getAnnotation(CommandDefinition.class);
+
+        try {
+            Command command = (repository != null) ?
+                    cls.getConstructor(Repository.class).newInstance(repository) :
+                    cls.getConstructor().newInstance();
+
+            COMMANDS.put(definition.name(), command);
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
+            throw new RuntimeException("Failed to register command: " + cls.getName(), e);
         }
     }
 }
