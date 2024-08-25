@@ -3,10 +3,7 @@ package io.github.pyrih.minigit.dispatcher;
 import io.github.pyrih.minigit.component.Repository;
 import io.github.pyrih.minigit.dispatcher.command.Command;
 import io.github.pyrih.minigit.dispatcher.command.annotation.CommandDefinition;
-import io.github.pyrih.minigit.dispatcher.command.impl.CatFileCommand;
-import io.github.pyrih.minigit.dispatcher.command.impl.HashObjectCommand;
-import io.github.pyrih.minigit.dispatcher.command.impl.HelpCommand;
-import io.github.pyrih.minigit.dispatcher.command.impl.InitCommand;
+import io.github.pyrih.minigit.dispatcher.command.impl.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +17,7 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
         register(InitCommand.class, repository);
         register(HashObjectCommand.class, repository);
         register(CatFileCommand.class, repository);
+        register(VersionCommand.class);
     }
 
     public void dispatch(String commandDefinition, String... arguments) {
@@ -39,6 +37,21 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
             try {
                 Constructor<? extends Command> constructor = cls.getConstructor(Repository.class);
                 Command command = constructor.newInstance(repository);
+                COMMANDS.put(definition.name(), command);
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                     IllegalAccessException e) {
+                throw new RuntimeException("Failed to register command: " + cls.getName(), e);
+            }
+        }
+    }
+
+    private void register(Class<? extends Command> cls) {
+        if (cls.isAnnotationPresent(CommandDefinition.class)) {
+            CommandDefinition definition = cls.getAnnotation(CommandDefinition.class);
+
+            try {
+                Constructor<? extends Command> constructor = cls.getConstructor();
+                Command command = constructor.newInstance();
                 COMMANDS.put(definition.name(), command);
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException e) {

@@ -82,6 +82,7 @@
                     <archive>
                         <manifestEntries>
                             <Main-Class>io.github.pyrih.minigit.Main</Main-Class>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                         </manifestEntries>
                     </archive>
                 </configuration>
