@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [ -L "/usr/local/bin/minigit" ]; then
+    rm /usr/local/bin/minigit
+fi
