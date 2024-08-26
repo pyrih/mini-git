@@ -17,10 +17,13 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
         register(HashObjectCommand.class, repository);
         register(CatFileCommand.class, repository);
         register(VersionCommand.class);
+        register(HelpCommand.class);
     }
 
     public void dispatch(String commandDefinition, String... arguments) {
-        Command command = COMMANDS.getOrDefault(commandDefinition, new HelpCommand());
+        Command command = COMMANDS.getOrDefault(
+                commandDefinition,
+                COMMANDS.get("--help"));
 
         if (command != null) {
             command.execute(arguments);

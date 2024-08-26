@@ -11,7 +11,8 @@
 .mtj.tmp/
 .idea
 .minigit
-sample.txt
+sample-1.txt
+sample-2.txt
 target/
 
 # Package Files #

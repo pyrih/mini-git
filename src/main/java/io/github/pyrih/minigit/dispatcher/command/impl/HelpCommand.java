@@ -4,7 +4,7 @@ import io.github.pyrih.minigit.dispatcher.command.Command;
 import io.github.pyrih.minigit.dispatcher.command.annotation.CommandDefinition;
 import io.github.pyrih.minigit.logger.ConsoleLogger;
 
-@CommandDefinition(name = "help")
+@CommandDefinition(name = "--help")
 public class HelpCommand implements Command {
     @Override
     public void execute(String... parameters) {
