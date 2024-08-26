@@ -13,13 +13,20 @@ public class CatFileCommand implements Command {
     }
 
     @Override
-    public void execute(String... parameters) {
-        if (parameters.length != 1) {
-            throw new IllegalArgumentException("Wrong number of parameters.");
+    public void execute(String... arguments) {
+        if (arguments.length != 1 && arguments.length != 2) {
+            throw new IllegalArgumentException("Wrong number of arguments.");
         }
 
-        String parameter = parameters[0];
+        if (arguments.length == 1) {
+            String content = this.repository.catFile(arguments[0], null);
+            System.out.println(content);
+        }
 
-        this.repository.catFile(parameter);
+        if (arguments.length == 2) {
+            String content = this.repository.catFile(arguments[0], arguments[1]);
+            System.out.println(content);
+        }
+
     }
 }

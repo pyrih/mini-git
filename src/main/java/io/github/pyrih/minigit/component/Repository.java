@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 
 public class Repository {
 
@@ -43,7 +43,7 @@ public class Repository {
         }
     }
 
-    public void hashObject(String parameter) {
+    public void hashObject(String parameter, String type) {
         // 1. Get the path of the file to store
         Path toStoreFilePath = Path.of(parameter);
 
@@ -57,25 +57,65 @@ public class Repository {
         Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
         System.out.println("A " + toStoreFilePath + " will be stored under the following path: " + targetPath);
 
+        if (type == null) {
+            type = "blob";
+        }
+
+        byte[] header = (type + "\0").getBytes();
+        byte[] object = new byte[header.length + content.getBytes().length];
+
+        System.arraycopy(header, 0, object, 0, header.length);
+        System.arraycopy(content.getBytes(), 0, object, header.length, content.getBytes().length);
+
         if (targetPath.toFile().exists()) {
             System.out.println("An existing " + targetPath + " file will be replaced...");
         }
 
         try {
-            Files.copy(toStoreFilePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.write(targetPath, object, StandardOpenOption.CREATE);
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while copying a file to an object database");
         }
     }
 
-    public void catFile(String parameter) {
-        Path path = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, parameter);
+    public String catFile(String oid, String expectedType) {
+        Path path = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
 
         if (!path.toFile().exists()) {
             throw new IllegalArgumentException("A file under the " + path + " path doesn't exist");
         }
 
-        String content = FileUtils.readFileContent(path);
-        System.out.println(content);
+        byte[] content;
+
+        try {
+            byte[] object = Files.readAllBytes(path);
+
+            int nullIndex = -1;
+
+            for (int i = 0; i < object.length; i++) {
+                if (object[i] == 0) {
+                    nullIndex = i;
+                    break;
+                }
+            }
+
+            if (nullIndex == -1) {
+                throw new IllegalArgumentException("Object format is invalid.");
+            }
+
+            String actualType = new String(object, 0, nullIndex);
+
+            if (expectedType != null && !actualType.equals(expectedType)) {
+                throw new IllegalArgumentException("Expected " + expectedType + ", got " + actualType);
+            }
+
+            content = new byte[object.length - nullIndex - 1];
+            System.arraycopy(object, nullIndex + 1, content, 0, content.length);
+
+            return new String(content);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

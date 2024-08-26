@@ -13,13 +13,11 @@ public class HashObjectCommand implements Command {
     }
 
     @Override
-    public void execute(String... parameters) {
-        if (parameters.length != 1) {
-            throw new IllegalArgumentException("Wrong number of parameters.");
+    public void execute(String... arguments) {
+        if (arguments.length != 1) {
+            throw new IllegalArgumentException("Wrong number of arguments.");
         }
 
-        String parameter = parameters[0];
-
-        this.repository.hashObject(parameter);
+        this.repository.hashObject(arguments[0], "blob");
     }
 }
