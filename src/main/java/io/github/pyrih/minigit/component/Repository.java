@@ -1,5 +1,6 @@
 package io.github.pyrih.minigit.component;
 
+import io.github.pyrih.minigit.logger.ConsoleLogger;
 import io.github.pyrih.minigit.util.FileUtils;
 import io.github.pyrih.minigit.util.HashingUtils;
 
@@ -116,6 +117,41 @@ public class Repository {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isNotSymbolicLink(File entry) throws IOException {
+        File canonicalFile = entry.getCanonicalFile();
+        File absoluteFile = entry.getAbsoluteFile();
+        return canonicalFile.equals(absoluteFile);
+    }
+
+    public void writeTree(String directoryPathName) {
+        File directory;
+
+        try {
+            directory = new File(directoryPathName).getCanonicalFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            try {
+                for (File file : files) {
+                    String fullPath = directoryPathName + File.separator + file.getName();
+
+                    if (file.isFile() && isNotSymbolicLink(file)) {
+                        // TODO write the file to the object database store
+                        ConsoleLogger.info(fullPath);
+                    } else if (file.isDirectory() && isNotSymbolicLink(file)) {
+                        writeTree(fullPath);
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error occurred while writing tree", e);
+            }
         }
     }
 }
