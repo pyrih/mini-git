@@ -1,5 +1,6 @@
 package io.github.pyrih.minigit.component;
 
+import io.github.pyrih.minigit.logger.ConsoleLogger;
 import io.github.pyrih.minigit.util.FileUtils;
 import io.github.pyrih.minigit.util.HashingUtils;
 
@@ -8,6 +9,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class Repository {
 
@@ -43,39 +47,10 @@ public class Repository {
         }
     }
 
-    public void hashObject(String parameter, String type) {
-        // 1. Get the path of the file to store
-        Path toStoreFilePath = Path.of(parameter);
-
-        // 2. Read the file
-        String content = FileUtils.readFileContent(toStoreFilePath);
-
-        // 3. Hash the content of the file using SHA-1
-        String oid = HashingUtils.generateSHA1Hash(content);
-
-        // 4. Store the file under ".minigit/objects/{hash}"
-        Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
-        System.out.println("A " + toStoreFilePath + " will be stored under the following path: " + targetPath);
-
-        if (type == null) {
-            type = "blob";
-        }
-
-        byte[] header = (type + "\0").getBytes();
-        byte[] object = new byte[header.length + content.getBytes().length];
-
-        System.arraycopy(header, 0, object, 0, header.length);
-        System.arraycopy(content.getBytes(), 0, object, header.length, content.getBytes().length);
-
-        if (targetPath.toFile().exists()) {
-            System.out.println("An existing " + targetPath + " file will be replaced...");
-        }
-
-        try {
-            Files.write(targetPath, object, StandardOpenOption.CREATE);
-        } catch (IOException e) {
-            throw new RuntimeException("An error occurred while copying a file to an object database");
-        }
+    private static boolean isNotSymbolicLink(File entry) throws IOException {
+        File canonicalFile = entry.getCanonicalFile();
+        File absoluteFile = entry.getAbsoluteFile();
+        return canonicalFile.equals(absoluteFile);
     }
 
     public String catFile(String oid, String expectedType) {
@@ -117,5 +92,109 @@ public class Repository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static boolean isIgnoredEntry(String path) {
+        return path.contains(".git/")
+                || path.contains(".minigit/")
+                || path.contains(".idea/")
+                || path.contains("target/");
+    }
+
+    public String hashObject(String parameter, String type) {
+        // 1. Get the path of the file to store
+        Path toStoreFilePath = Path.of(parameter);
+
+        // 2. Read the file
+        String content = null;
+        if (type == null) {
+            type = "blob";
+        }
+
+        if (type.equals("blob")) {
+            content = FileUtils.readFileContent(toStoreFilePath);
+        } else if (type.equals("tree")) {
+            content = parameter;
+        }
+
+        // 3. Hash the content of the file using SHA-1
+        String oid = HashingUtils.generateSHA1Hash(content);
+
+        // 4. Store the file under ".minigit/objects/{hash}"
+        Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
+        System.out.println("A " + toStoreFilePath + " will be stored under the following path: " + targetPath);
+
+        byte[] header = (type + "\0").getBytes();
+        byte[] object = new byte[header.length + content.getBytes().length];
+
+        System.arraycopy(header, 0, object, 0, header.length);
+        System.arraycopy(content.getBytes(), 0, object, header.length, content.getBytes().length);
+
+        if (targetPath.toFile().exists()) {
+            System.out.println("An existing " + targetPath + " file will be replaced...");
+        }
+
+        try {
+            Files.write(targetPath, object, StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while copying a file to an object database");
+        }
+        return oid;
+    }
+
+    public String writeTree(String directoryPathName) {
+        List<Entry> entries = new ArrayList<>();
+        File directory;
+
+        try {
+            directory = new File(directoryPathName).getCanonicalFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            try {
+                for (File entry : files) {
+                    String fullPath = directoryPathName + File.separator + entry.getName();
+
+                    if (isIgnoredEntry(fullPath)) {
+                        continue;
+                    }
+
+                    String type;
+                    String oid = null;
+
+                    if (entry.isFile() && isNotSymbolicLink(entry)) {
+                        // Write the file to the object database store
+                        type = "blob";
+                        oid = this.hashObject(fullPath, type);
+                    } else if (entry.isDirectory() && isNotSymbolicLink(entry)) {
+                        type = "tree";
+                        oid = this.writeTree(fullPath);
+                    } else {
+                        ConsoleLogger.warn("Unknown entry: " + entry.getName());
+                        continue;
+                    }
+
+                    entries.add(new Entry(entry.getName(), oid, type));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error occurred while writing tree", e);
+            }
+        }
+
+        entries.sort(Comparator.comparing(element -> element.name));
+
+        StringBuilder tree = new StringBuilder();
+        for (Entry entry : entries) {
+            tree.append(String.format("%s %s %s%n", entry.type, entry.oid, entry.name));
+        }
+
+        return this.hashObject(tree.toString(), "tree");
+    }
+
+    private record Entry(String name, String oid, String type) {
     }
 }
