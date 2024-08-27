@@ -106,7 +106,16 @@ public class Repository {
         Path toStoreFilePath = Path.of(parameter);
 
         // 2. Read the file
-        String content = FileUtils.readFileContent(toStoreFilePath);
+        String content = null;
+        if (type == null) {
+            type = "blob";
+        }
+
+        if (type.equals("blob")) {
+            content = FileUtils.readFileContent(toStoreFilePath);
+        } else if (type.equals("tree")) {
+            content = parameter;
+        }
 
         // 3. Hash the content of the file using SHA-1
         String oid = HashingUtils.generateSHA1Hash(content);
@@ -114,10 +123,6 @@ public class Repository {
         // 4. Store the file under ".minigit/objects/{hash}"
         Path targetPath = Path.of(GIT_DIRECTORY, OBJECTS_DIRECTORY, oid);
         System.out.println("A " + toStoreFilePath + " will be stored under the following path: " + targetPath);
-
-        if (type == null) {
-            type = "blob";
-        }
 
         byte[] header = (type + "\0").getBytes();
         byte[] object = new byte[header.length + content.getBytes().length];
