@@ -139,13 +139,17 @@ public class Repository {
 
         if (files != null) {
             try {
-                for (File file : files) {
-                    String fullPath = directoryPathName + File.separator + file.getName();
+                for (File entry : files) {
+                    String fullPath = directoryPathName + File.separator + entry.getName();
 
-                    if (file.isFile() && isNotSymbolicLink(file)) {
+                    if (isIgnoredEntry(fullPath)) {
+                        continue;
+                    }
+
+                    if (entry.isFile() && isNotSymbolicLink(entry)) {
                         // TODO write the file to the object database store
                         ConsoleLogger.info(fullPath);
-                    } else if (file.isDirectory() && isNotSymbolicLink(file)) {
+                    } else if (entry.isDirectory() && isNotSymbolicLink(entry)) {
                         writeTree(fullPath);
                     }
                 }
@@ -153,5 +157,12 @@ public class Repository {
                 throw new RuntimeException("Error occurred while writing tree", e);
             }
         }
+    }
+
+    private boolean isIgnoredEntry(String path) {
+        return path.contains(".git/")
+                || path.contains(".minigit/")
+                || path.contains(".idea/")
+                || path.contains("target/");
     }
 }
