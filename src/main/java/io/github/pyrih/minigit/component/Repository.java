@@ -1,6 +1,5 @@
 package io.github.pyrih.minigit.component;
 
-import io.github.pyrih.minigit.logger.ConsoleLogger;
 import io.github.pyrih.minigit.util.FileUtils;
 import io.github.pyrih.minigit.util.HashingUtils;
 
@@ -147,8 +146,8 @@ public class Repository {
                     }
 
                     if (entry.isFile() && isNotSymbolicLink(entry)) {
-                        // TODO write the file to the object database store
-                        ConsoleLogger.info(fullPath);
+                        // Write the file to the object database store
+                        this.hashObject(fullPath, null);
                     } else if (entry.isDirectory() && isNotSymbolicLink(entry)) {
                         writeTree(fullPath);
                     }
