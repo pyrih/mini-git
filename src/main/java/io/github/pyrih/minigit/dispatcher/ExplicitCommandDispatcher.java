@@ -17,6 +17,7 @@ public class ExplicitCommandDispatcher implements CommandDispatcher {
         register(HashObjectCommand.class, repository);
         register(CatFileCommand.class, repository);
         register(WriteTreeCommand.class, repository);
+        register(ReadTreeCommand.class, repository);
         register(VersionCommand.class);
         register(HelpCommand.class);
     }

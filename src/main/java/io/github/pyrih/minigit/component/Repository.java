@@ -8,10 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class Repository {
 
@@ -193,6 +192,80 @@ public class Repository {
         }
 
         return this.hashObject(tree.toString(), "tree");
+    }
+
+    public void readTree(String treeOid) {
+        Map<String, String> tree = getTree(treeOid, ".");
+
+        if (tree == null) {
+            throw new IllegalArgumentException("Tree should not be null");
+        }
+
+        for (Map.Entry<String, String> entry : tree.entrySet()) {
+            String path = entry.getKey();
+            String oid = entry.getValue();
+
+            Path filePath = Paths.get(path);
+
+            try {
+                Files.createDirectories(filePath.getParent());
+                Files.write(filePath, this.catFile(oid, "blob").getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException("Error occurred while extracting tree from object database", e);
+            }
+        }
+    }
+
+    private Map<String, String> getTree(String oid, String basePath) {
+        Map<String, String> result = new HashMap<>();
+
+        for (Entry entry : iterateTreeEntries(oid)) {
+            String name = entry.name();
+            String entryOid = entry.oid();
+            String type = entry.type();
+
+            if (name.contains("/")) {
+                throw new IllegalArgumentException("Name cannot contain '/' character: " + name);
+            }
+
+            if (name.equals("..") || name.equals(".")) {
+                throw new IllegalArgumentException("Invalid name: " + name);
+            }
+
+            String path = basePath + name;
+
+            switch (type) {
+                case "blob" -> result.put(path, entryOid);
+                case "tree" -> result.putAll(getTree(entryOid, path + "/"));
+                default -> throw new IllegalArgumentException("Unknown tree entry type: " + type);
+            }
+        }
+
+        return result;
+    }
+
+    private Iterable<? extends Entry> iterateTreeEntries(String oid) {
+        if (oid == null || oid.isBlank()) {
+            throw new IllegalArgumentException("OID cannot be null or empty.");
+        }
+
+        String tree = this.catFile(oid, "tree");
+        String[] entries = tree.split("\n");
+
+        return () -> new Iterator<Entry>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < entries.length;
+            }
+
+            @Override
+            public Entry next() {
+                String[] parts = entries[index++].split(" ", 3);
+                return new Entry(parts[2], parts[1], parts[0]);
+            }
+        };
     }
 
     private record Entry(String name, String oid, String type) {
