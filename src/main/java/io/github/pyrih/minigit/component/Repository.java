@@ -6,10 +6,8 @@ import io.github.pyrih.minigit.util.HashingUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 public class Repository {
@@ -194,7 +192,48 @@ public class Repository {
         return this.hashObject(tree.toString(), "tree");
     }
 
+    private static void emptyCurrentDirectory() throws IOException {
+        Path currentDirectory = Paths.get(".");
+
+        Files.walkFileTree(
+                currentDirectory,
+                new SimpleFileVisitor<>() {
+
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                        String relativePath = currentDirectory.relativize(file).toString();
+
+                        if (!isIgnoredEntry(relativePath) && Files.isRegularFile(file)) {
+                            Files.deleteIfExists(file);
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        String relativePath = currentDirectory.relativize(dir).toString();
+
+                        if (!isIgnoredEntry(relativePath)) {
+                            try {
+                                Files.delete(dir);
+                            } catch (DirectoryNotEmptyException e) {
+                                // Directory might not be empty if it contains ignored files, so we ignore this exception.
+                            }
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                }
+        );
+    }
+
     public void readTree(String treeOid) {
+        try {
+            emptyCurrentDirectory();
+        } catch (IOException e) {
+            throw new RuntimeException("Error occurred while cleaning the current directory", e);
+        }
+
         Map<String, String> tree = getTree(treeOid, ".");
 
         if (tree == null) {
